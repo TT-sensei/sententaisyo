@@ -4,59 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>線？点？しわけくん</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #f0f8ff;
-            --primary: #4CAF50;
-            --btn-line: #ff7675;
-            --btn-point: #74b9ff;
-            --btn-both: #a29bfe;
-            --btn-none: #b2bec3;
+            --primary: #ff9f43;
+            --btn-line: #ff6b6b;
+            --btn-point: #54a0ff;
+            --btn-both: #9b59b6;
+            --btn-none: #a4b0be;
+            --text-color: #2d3436;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Hiragino Maru Gothic ProN', 'Rounded M+ 1c', sans-serif;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
             background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
             touch-action: manipulation;
+            color: var(--text-color);
         }
 
+        /* --- ヘッダー（スコア・タイマー） --- */
         header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: var(--primary);
             color: white;
-            padding: 10px;
-            font-size: 24px;
-            font-weight: bold;
+            padding: 10px 20px;
+            font-size: 22px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             z-index: 10;
         }
 
-        /* レーン（回転寿司部分） */
+        .header-stat {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* --- ゲームエリア --- */
         #lane-container {
             flex: 1;
             position: relative;
-            background: #e0e0e0;
-            border-bottom: 8px solid #9e9e9e;
+            background: #dfe6e9;
+            border-bottom: 10px solid #b2bec3;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.2) 50%);
+            background-size: 50px 50px;
         }
 
         #target-zone {
             width: 150px;
             height: 150px;
-            border: 4px dashed #ff9800;
-            border-radius: 10px;
-            background: rgba(255, 152, 0, 0.1);
+            border: 6px dashed #ff9f43;
+            border-radius: 20px;
+            background: rgba(255, 159, 67, 0.15);
             position: absolute;
             z-index: 1;
+            box-shadow: 0 0 15px rgba(255, 159, 67, 0.3);
         }
 
         .shape-item {
@@ -64,34 +79,37 @@
             width: 120px;
             height: 120px;
             z-index: 2;
-            transition: left 0.5s linear;
+            transition: left 0.3s cubic-bezier(0.25, 1.5, 0.5, 1);
         }
 
-        /* 操作ボタンエリア */
+        /* --- コントロールボタン --- */
         #controls {
-            height: 200px;
+            height: 220px;
             background: white;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 15px;
             padding: 20px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            position: relative;
         }
 
         .sort-btn {
-            font-size: 22px;
-            font-weight: bold;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 24px;
             color: white;
             border: none;
-            border-radius: 15px;
+            border-radius: 20px;
             cursor: pointer;
-            box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2);
             transition: transform 0.1s, box-shadow 0.1s;
         }
 
         .sort-btn:active {
-            transform: translateY(6px);
+            transform: translateY(8px);
             box-shadow: 0 0 0 rgba(0,0,0,0.2);
         }
 
@@ -100,11 +118,66 @@
         #btn-both { background-color: var(--btn-both); }
         #btn-none { background-color: var(--btn-none); }
 
-        /* 検証モーダル（解説画面） */
+        /* --- 各種スクリーン（スタート・エンド） --- */
+        .overlay-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            color: white;
+            text-align: center;
+        }
+
+        .title-logo {
+            font-size: 50px;
+            font-weight: bold;
+            text-shadow: 3px 3px 0 #ff9f43, 6px 6px 0 #e66767;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            margin-bottom: 40px;
+            background: rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+
+        .action-btn {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            padding: 20px 60px;
+            font-size: 30px;
+            border-radius: 50px;
+            border: none;
+            background: #ff4757;
+            color: white;
+            box-shadow: 0 10px 0 #c0392b;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+
+        .action-btn:active {
+            transform: translateY(10px);
+            box-shadow: 0 0 0 #c0392b;
+            animation: none;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        /* --- 解説モーダル --- */
         #modal {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(45, 52, 54, 0.9);
             display: none;
             flex-direction: column;
             align-items: center;
@@ -113,100 +186,85 @@
             color: white;
         }
 
-        #modal-result {
-            font-size: 40px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+        #modal-result { font-size: 45px; margin-bottom: 10px; }
+        #modal-combo { font-size: 24px; color: #f1c40f; margin-bottom: 20px; height: 30px;}
 
         #lab-area {
-            width: 200px;
-            height: 200px;
-            background: white;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            margin-bottom: 30px;
+            width: 220px; height: 220px;
+            background: white; border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-bottom: 20px;
         }
 
-        #lab-shape {
-            width: 160px;
-            height: 160px;
-        }
+        #lab-shape { width: 160px; height: 160px; }
 
-        /* アニメーション用クラス */
-        .anim-point {
-            animation: rotate180 2s ease-in-out infinite alternate;
-        }
+        .anim-point { animation: rotate180 2s ease-in-out infinite alternate; }
         @keyframes rotate180 {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(180deg); }
         }
 
         .axis-line {
-            position: absolute;
-            width: 4px;
-            height: 100%;
-            background: red;
-            display: none;
+            position: absolute; width: 4px; height: 100%;
+            background: #ff4757; display: none;
         }
 
         #next-btn {
-            padding: 15px 40px;
-            font-size: 24px;
-            border-radius: 30px;
-            border: none;
-            background: #ffeb3b;
-            color: #333;
-            font-weight: bold;
-            cursor: pointer;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            padding: 15px 50px; font-size: 26px; border-radius: 40px;
+            border: none; background: #1dd1a1; color: white;
+            box-shadow: 0 8px 0 #10ac84; cursor: pointer;
         }
-
-        #start-overlay {
-            position: absolute;
-            top:0; left:0; width:100%; height:100%;
-            background: var(--bg-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-        }
+        #next-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #10ac84; }
 
     </style>
 </head>
 <body>
 
-    <div id="start-overlay">
-        <button id="next-btn" onclick="startGame()">ゲームスタート！</button>
+    <div id="start-screen" class="overlay-screen">
+        <div class="title-logo">線？点？<br>しわけくん</div>
+        <div class="subtitle">図形を正しく仕分けてスコアを稼ごう！<br>制限時間は60秒！</div>
+        <button class="action-btn" onclick="startGame()">スタート！</button>
     </div>
 
-    <header>線？点？しわけくん</header>
+    <div id="end-screen" class="overlay-screen" style="display: none;">
+        <div style="font-size: 40px; margin-bottom: 10px;">タイムアップ！</div>
+        <div style="font-size: 24px; margin-bottom: 20px;">あなたの最終スコアは...</div>
+        <div id="final-score" style="font-size: 80px; font-weight: bold; color: #f1c40f; text-shadow: 2px 2px 0 #333; margin-bottom: 10px;">0</div>
+        <div id="final-rank" style="font-size: 30px; margin-bottom: 40px; background: #ff4757; padding: 10px 30px; border-radius: 30px;">ランク計算中...</div>
+        <button class="action-btn" onclick="resetGame()" style="background: #1e90ff; box-shadow: 0 10px 0 #0984e3;">もう1回あそぶ</button>
+    </div>
+
+    <header>
+        <div class="header-stat">スコア: <span id="score">0</span></div>
+        <div>しわけくん</div>
+        <div class="header-stat" style="background: #ff7675;">残り: <span id="time">60</span>秒</div>
+    </header>
 
     <div id="lane-container">
         <div id="target-zone"></div>
-        </div>
+    </div>
 
     <div id="controls">
-        <button class="sort-btn" id="btn-line" onclick="checkAnswer('line')">線対称のみ</button>
-        <button class="sort-btn" id="btn-point" onclick="checkAnswer('point')">点対称のみ</button>
-        <button class="sort-btn" id="btn-both" onclick="checkAnswer('both')">どっちも！</button>
-        <button class="sort-btn" id="btn-none" onclick="checkAnswer('none')">どちらでもない</button>
+        <button class="sort-btn" id="btn-line" onclick="checkAnswer('line')">線対称</button>
+        <button class="sort-btn" id="btn-point" onclick="checkAnswer('point')">点対称</button>
+        <button class="sort-btn" id="btn-both" onclick="checkAnswer('both')">どっちも</button>
+        <button class="sort-btn" id="btn-none" onclick="checkAnswer('none')">ちがう</button>
     </div>
 
     <div id="modal">
         <div id="modal-result">正解！</div>
+        <div id="modal-combo"></div>
         <div id="lab-area">
             <div id="lab-shape"></div>
             <div id="axis" class="axis-line"></div>
         </div>
-        <p id="modal-exp" style="font-size: 18px; margin-bottom: 20px;"></p>
+        <p id="modal-exp" style="font-size: 20px; margin-bottom: 20px; text-align: center; padding: 0 20px;"></p>
         <button id="next-btn" onclick="nextShape()">次へすすむ</button>
     </div>
 
     <script>
-        // 30種類の図形データ (SVG)
+        // 30種類の図形データ
         const shapesData = [
             { id: 1, name: "二等辺三角形", type: "line", svg: '<polygon points="50,10 90,90 10,90" fill="#ff6b6b"/>' },
             { id: 2, name: "平行四辺形", type: "point", svg: '<polygon points="30,20 90,20 70,80 10,80" fill="#4ecdc4"/>' },
@@ -226,7 +284,7 @@
             { id: 16, name: "正六角形", type: "both", svg: '<polygon points="50,5 89,27 89,72 50,95 11,72 11,27" fill="#8e44ad"/>' },
             { id: 17, name: "正五角形", type: "line", svg: '<polygon points="50,10 88,38 73,86 27,86 12,38" fill="#e84393"/>' },
             { id: 18, name: "ハート", type: "line", svg: '<path d="M50,85 C50,85 10,55 10,30 A20,20 0 0,1 50,30 A20,20 0 0,1 90,30 C90,55 50,85 50,85 Z" fill="#ff4757"/>' },
-            { id: 19, name: "十字（プラス）", type: "both", svg: '<path d="M40,10 L60,10 L60,40 L90,40 L90,60 L60,60 L60,90 L40,90 L40,60 L10,60 L10,40 L40,40 Z" fill="#2ed573"/>' },
+            { id: 19, name: "十字", type: "both", svg: '<path d="M40,10 L60,10 L60,40 L90,40 L90,60 L60,60 L60,90 L40,90 L40,60 L10,60 L10,40 L40,40 Z" fill="#2ed573"/>' },
             { id: 20, name: "アルファベット H", type: "both", svg: '<path d="M25,15 L40,15 L40,40 L60,40 L60,15 L75,15 L75,85 L60,85 L60,55 L40,55 L40,85 L25,85 Z" fill="#1e90ff"/>' },
             { id: 21, name: "アルファベット A", type: "line", svg: '<path d="M40,15 L60,15 L85,85 L65,85 L58,65 L42,65 L35,85 L15,85 Z M46,45 L54,45 L50,30 Z" fill="#ffa502"/>' },
             { id: 22, name: "アルファベット M", type: "line", svg: '<path d="M15,90 L15,20 L40,20 L50,50 L60,20 L85,20 L85,90 L65,90 L65,50 L50,70 L35,50 L35,90 Z" fill="#3742fa"/>' },
@@ -240,12 +298,18 @@
             { id: 30, name: "吹き出し", type: "none", svg: '<path d="M15,30 Q15,15 50,15 Q85,15 85,30 Q85,60 50,60 Q30,60 15,80 Q20,60 15,60 Q15,60 15,30 Z" fill="#a4b0be"/>' }
         ];
 
-        let currentShapeIndex = 0;
+        let gameShapes = [];
         let currentShapeData = null;
         let activeElement = null;
         let audioCtx;
+        
+        // ゲームステータス変数
+        let score = 0;
+        let combo = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
 
-        // 効果音生成（ファイル不要にするためWeb Audio APIを使用）
+        // 効果音
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
@@ -258,91 +322,150 @@
             gain.connect(audioCtx.destination);
 
             if (type === 'correct') {
-                // ピロン！
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
-                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // A6
+                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
                 gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-            } else {
-                // ブブー
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(150, audioCtx.currentTime);
                 gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
             }
+        }
+
+        // ゲーム初期化
+        function resetGame() {
+            document.getElementById('end-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
         }
 
         function startGame() {
             initAudio();
-            document.getElementById('start-overlay').style.display = 'none';
-            // 配列をシャッフル
-            shapesData.sort(() => Math.random() - 0.5);
+            document.getElementById('start-screen').style.display = 'none';
+            
+            // 変数リセット
+            score = 0;
+            combo = 0;
+            timeLeft = 60;
+            updateScoreDisplay();
+            document.getElementById('time').innerText = timeLeft;
+            
+            // 図形シャッフル
+            gameShapes = [...shapesData].sort(() => Math.random() - 0.5);
+            
+            // タイマースタート
+            startTimer();
             spawnShape();
         }
 
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    finishGame();
+                }
+            }, 1000);
+        }
+
+        function finishGame() {
+            clearInterval(timerInterval);
+            document.getElementById('modal').style.display = 'none'; // モーダルが開いていれば消す
+            if (activeElement) activeElement.remove();
+            
+            // ランク判定
+            let rank = "";
+            if (score >= 5000) rank = "👑 伝説の対称マスター！";
+            else if (score >= 3000) rank = "🌟 スゴウデしわけ職人";
+            else if (score >= 1500) rank = "👍 なかなかのセンス！";
+            else rank = "🐣 まだまだこれから！";
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-rank').innerText = rank;
+            document.getElementById('end-screen').style.display = 'flex';
+        }
+
         function spawnShape() {
-            if (currentShapeIndex >= shapesData.length) {
-                alert("ぜんぶ終わりました！おつかれさま！");
-                currentShapeIndex = 0;
-                shapesData.sort(() => Math.random() - 0.5); // 再シャッフル
+            if (timeLeft <= 0) return;
+            if (gameShapes.length === 0) {
+                // 足りなくなったら再補充＆シャッフル
+                gameShapes = [...shapesData].sort(() => Math.random() - 0.5);
             }
 
-            currentShapeData = shapesData[currentShapeIndex];
+            currentShapeData = gameShapes.pop(); // 1つ取り出す
             const lane = document.getElementById('lane-container');
             
-            // 図形要素の作成
             const el = document.createElement('div');
             el.className = 'shape-item';
             el.innerHTML = `<svg viewBox="0 0 100 100" width="100%" height="100%">${currentShapeData.svg}</svg>`;
             
-            // 右端からスタート
             el.style.left = '100%';
             lane.appendChild(el);
             activeElement = el;
 
-            // アニメーションで中央へ
             setTimeout(() => {
-                el.style.left = 'calc(50% - 60px)'; // target-zoneの真ん中
+                if(activeElement) el.style.left = 'calc(50% - 60px)';
             }, 50);
         }
 
         function checkAnswer(selectedType) {
-            if (!activeElement) return;
+            if (!activeElement || timeLeft <= 0) return;
+            clearInterval(timerInterval); // 解説中はタイマーストップ（親切設計）
             
             const isCorrect = (selectedType === currentShapeData.type);
             playSound(isCorrect ? 'correct' : 'wrong');
             
+            if (isCorrect) {
+                combo++;
+                // コンボボーナス（基本100点 ＋ コンボ数×20点）
+                const points = 100 + (combo * 20);
+                score += points;
+            } else {
+                combo = 0; // コンボリセット
+            }
+            updateScoreDisplay();
+            
             showLabModal(isCorrect);
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score').innerText = score;
         }
 
         function showLabModal(isCorrect) {
             const modal = document.getElementById('modal');
             const resultText = document.getElementById('modal-result');
+            const comboText = document.getElementById('modal-combo');
             const expText = document.getElementById('modal-exp');
             const labShape = document.getElementById('lab-shape');
             const axis = document.getElementById('axis');
 
-            // モーダル設定
             modal.style.display = 'flex';
-            resultText.innerText = isCorrect ? "大正解！🎉" : "ざんねん！💦";
-            resultText.style.color = isCorrect ? "#ffeaa7" : "#ff7675";
             
-            // 図形をセット
+            if (isCorrect) {
+                resultText.innerText = "大正解！🎉";
+                resultText.style.color = "#1dd1a1";
+                comboText.innerText = combo >= 2 ? `${combo}コンボ！！🔥` : "";
+            } else {
+                resultText.innerText = "ざんねん！💦";
+                resultText.style.color = "#ff6b6b";
+                comboText.innerText = "";
+            }
+            
             labShape.innerHTML = `<svg viewBox="0 0 100 100" width="100%" height="100%">${currentShapeData.svg}</svg>`;
-            labShape.className = ""; // クラスリセット
-            axis.style.display = 'none'; // 軸リセット
+            labShape.className = "";
+            axis.style.display = 'none';
 
-            // 解説とアニメーションのセット
-            let exp = `これは「${currentShapeData.name}」です。<br>`;
+            let exp = `「${currentShapeData.name}」<br>`;
             
             if (currentShapeData.type === 'line' || currentShapeData.type === 'both') {
                 axis.style.display = 'block';
-                exp += "赤い線で折ると、ぴったり重なるね！（線対称）<br>";
+                exp += "線で折ると、ぴったり重なるよ！（線対称）<br>";
             }
             if (currentShapeData.type === 'point' || currentShapeData.type === 'both') {
                 labShape.classList.add('anim-point');
@@ -361,8 +484,10 @@
                 activeElement.remove();
                 activeElement = null;
             }
-            currentShapeIndex++;
-            spawnShape();
+            if (timeLeft > 0) {
+                startTimer(); // タイマー再開
+                spawnShape();
+            }
         }
     </script>
 </body>
